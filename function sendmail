@@ -1,0 +1,59 @@
+public function SendEmail($email) {
+
+        $mail = new PHPMailer();
+        $mail->CharSet = "utf-8";
+        $mail->isSMTP();
+        $mail->Host = "smtp.gmail.com";
+        $mail->port = 584;
+        $mail->SMTPSecure = "tls";
+        $mail->SMTPAuth = true;
+        // port 465 584;
+
+        $gmail_username = " "; // เมลของตัวส่ง
+        $gmail_password = " "; //รหัวของตัวส่งขอในgoogle api
+
+        $sender = " "; //หัวข้อ
+        $email_sender = " "; // ชื่อผู้ส่ง
+
+        $email_user_send = $email;
+        $email_receiver = $email_user_send;
+        $subject = " "; //ชื่อหัวข้อ
+
+        $mail->Username = $gmail_username;
+        $mail->Password = $gmail_password;
+        $mail->setFrom($email_sender,$sender);
+        $mail->addAddress($email_receiver);
+        $mail->Subject = $subject;
+
+        $OTP=sprintf("%06d", mt_rand(0, 999999));
+        $ref=sprintf("%06d", mt_rand(0, 999999));
+        $date=date('Y/m/d h:i:sa');
+        $request["email"] = $email; //ตัวแปรโยนมาจากphp
+        $request["OTP"] = $OTP; //ตัวแปรโยนมาจากphp
+        $request["ref"] = $ref; //ตัวแปรโยนมาจากphp
+        $request["date"] = $date; //ตัวแปรโยนมาจากphp
+        $email_content = "
+                            <!DOCTYPE html>
+                            <html>
+                            <body>
+                                <p>email $email</p>
+                                <p>OTP is $OTP</p>
+                                <p>ref no. is $ref</p>
+                                <p>date $date</p>
+                            </body>
+                            </html>
+
+                        "; // เนื้อหาใน gmail
+
+        $data = $this-> User3models ->OTPref($request);
+        if($email_receiver){
+            $mail->msgHTML($email_content);
+
+            if(!$mail->send()){ // แสดง response email
+                $this->response('false', MY_Controller::HTTP_OK);
+            }else{
+                // $this->response($request, MY_Controller::HTTP_OK);
+            }
+
+        }
+    }
